@@ -117,7 +117,7 @@ class Optimize(object):
         for i in range(k):
             print(i)
             self.input_params(0.8, 0.9)
-            self.opt(n, method = 'sgd')
+            self.opt(n, method = 'adam')
             output_a[i, :] = self.a_rec
             output_b[i, :] = self.b_rec
             self.clear_rec()
@@ -169,7 +169,7 @@ x_data = np.arange(0, 1, 0.01)
 Test = Optimize(0.25, 0.75, [0.8, 0.9], x_data, stochastic = True)
 print(Test.err(Test.x_data))
 print('err', err(x_data, 0.117, 0.990))
-Test.opt(50, method = 'sgd')
+Test.opt(50, method = 'adam')
 print(Test.err(Test.x_data))
 print('vars', Test.a_approx, Test.b_approx)
 Test.clear_rec()
@@ -187,6 +187,7 @@ plt.ylabel('$b$', fontsize = 20)
 plt.xlabel('$a$', fontsize = 20)
 plt.ylim(0.5, 1.2)
 plt.xlim(0.0, 1.0)
+plt.savefig('images/adam_5.png')
 plt.show()
 
 
