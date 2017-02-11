@@ -26,11 +26,20 @@ control it.
 [xgboost](https://github.com/fmfn/BayesianOptimization/blob/master/examples/xgboost_example.py))
 for examples of how to use this package to tune parameters of ML estimators
 using cross validation and bayesian optimization.
+## Setup
 
+We are going to use stochastic gradient descent to learn the values of a and b in this function:
+
+![Five Adam runs](https://github.com/AsaCooperStickland/Optimizer_Visualisers/blob/master/images/maineqn.gif)
+
+which looks like: 
+
+![Five Adam runs](https://github.com/AsaCooperStickland/Optimizer_Visualisers/blob/master/images/func.png)
 
 ## Comparing Optimizers
 
-Vanilla SGD can't deal with how noisy the information it's getting is, and fails to find the global optimum completely! 
+Vanilla SGD can't deal with how noisy the information it's getting is, and fails to find the global optimum completely! The black lines below show true
+values for a and b, and the red dot is where we started from (a = 0.8, b = 0.9)
 
 ![Five Adam runs](https://github.com/AsaCooperStickland/Optimizer_Visualisers/blob/master/images/sgd_5.png)
 

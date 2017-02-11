@@ -117,15 +117,12 @@ class Optimize(object):
         for i in range(k):
             print(i)
             self.input_params(0.8, 0.9)
-            self.opt(n, method = 'adam')
+            self.opt(n, method = 'sgd')
             output_a[i, :] = self.a_rec
             output_b[i, :] = self.b_rec
             self.clear_rec()
         return output_a, output_b
-            
-        
-            
-                
+                      
 def true_func(x, a, b):
     return ((1.0/0.05**0.5)*np.exp(-(x - a)**2/0.05) +
             (1.0/0.01**0.5)*np.exp(-(x - b)**2/0.01))
@@ -133,6 +130,37 @@ def true_func(x, a, b):
 def err(xs, a_approx, b_approx):
     tot = (true_func(xs, a_approx, b_approx) - true_func(xs, 0.25, 0.75))**2
     return np.mean(tot)
+
+def plot_paths():
+
+    x_data = np.arange(0, 1, 0.01)
+    a_guess = np.arange(0.0, 1.0, 0.01)
+    b_guess = np.arange(0.5, 1.5, 0.01)
+    l_a = len(a_guess)
+    l_b = len(b_guess)
+
+    errors = np.zeros([l_a, l_b])
+    for i in range(l_a):
+        for j in range(l_b):
+            errors[l_a - i - 1, j] = err(x_data, a_guess[i], b_guess[j])
+    x_data = np.arange(0, 1, 0.01)
+    Example = Optimize(0.25, 0.75, [0.8, 0.9], x_data, stochastic = True)
+    a_s, b_s = Example .generate_paths(5, 70)
+
+    plt.figure()
+    plt.imshow(errors, cmap = 'Blues', interpolation='bilinear',  extent=[0.0,1.0,0.5,1.2])
+    for i in range(5):
+        plt.plot(a_s[i,:], b_s[i,:], color = 'green')
+        plt.scatter(a_s[i,:], b_s[i,:], s= 30, alpha=0.3, edgecolor='black', facecolor='g', linewidth=0.75)
+    plt.scatter(0.8, 0.9, s= 30, alpha=1.0, edgecolor='black', facecolor='r', linewidth=0.75)
+    plt.plot((0.25, 0.25), (0.5, 1.2), 'k-')
+    plt.plot((0.0, 1.0), (0.75, 0.75), 'k-')
+    plt.ylabel('$b$', fontsize = 20)
+    plt.xlabel('$a$', fontsize = 20)
+    plt.ylim(0.5, 1.2)
+    plt.xlim(0.0, 1.0)
+    plt.savefig('images/sgd_5.png')
+    plt.show()
 
 x_data = np.arange(0, 1, 0.01)
 y_data = true_func(x_data, 0.25, 0.75)
@@ -148,7 +176,12 @@ y_data_samp = true_func(x_data_samp, 0.25, 0.75)
 
 plt.figure()
 plt.plot(x_data, y_data)
-plt.scatter(x_data_samp, y_data_samp)
+plt.ylabel('$y$', fontsize = 20)
+plt.xlabel('$x$', fontsize = 20)
+plt.tight_layout()
+plt.savefig('images/func.png')
+
+#plt.scatter(x_data_samp, y_data_samp)
 #plt.show()
 
 errors = np.zeros([l_a, l_b])
@@ -156,7 +189,7 @@ for i in range(l_a):
     for j in range(l_b):
         errors[l_a - i - 1, j] = err(x_data_samp, a_guess[i], b_guess[j])
 
-
+test = plot_paths()
 #fig = plt.figure()
 #ax = fig.gca(projection='3d')
 #surf = ax.plot_surface(a_guess, b_guess, errors, cmap=cm.coolwarm,
@@ -165,30 +198,7 @@ for i in range(l_a):
 
         
 
-x_data = np.arange(0, 1, 0.01)
-Test = Optimize(0.25, 0.75, [0.8, 0.9], x_data, stochastic = True)
-print(Test.err(Test.x_data))
-print('err', err(x_data, 0.117, 0.990))
-Test.opt(50, method = 'adam')
-print(Test.err(Test.x_data))
-print('vars', Test.a_approx, Test.b_approx)
-Test.clear_rec()
-a_s, b_s = Test.generate_paths(5, 70)
 
-
-plt.figure()
-plt.imshow(errors, cmap = 'Blues', interpolation='bilinear',  extent=[0.0,1.0,0.5,1.2])
-for i in range(5):
-    plt.plot(a_s[i,:], b_s[i,:], color = 'green')
-    plt.scatter(a_s[i,:], b_s[i,:], s= 30, alpha=0.3, edgecolor='black', facecolor='g', linewidth=0.75)
-plt.plot((0.25, 0.25), (0.5, 1.2), 'k-')
-plt.plot((0.0, 1.0), (0.75, 0.75), 'k-')
-plt.ylabel('$b$', fontsize = 20)
-plt.xlabel('$a$', fontsize = 20)
-plt.ylim(0.5, 1.2)
-plt.xlim(0.0, 1.0)
-plt.savefig('images/adam_5.png')
-plt.show()
 
 
 
