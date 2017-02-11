@@ -23,7 +23,7 @@ from datetime import datetime'''
 import os
 
 class Optimize(object):
-    def __init__(self, a, b, init, x_data, stochastic = True):
+    def __init__(self, a, b, init, x_data, stochastic = True, samples = 2):
         self.a_true = a
         self.b_true = b
         self.a_approx = init[0]
@@ -32,6 +32,7 @@ class Optimize(object):
         self.b_rec = np.array([])
         self.x_data = x_data
         self.stochastic = stochastic
+        self.samples = samples
         if stochastic == True:
             self.get_minibatch()
         else:
@@ -43,7 +44,7 @@ class Optimize(object):
         self.grad = self.calc_grad()
 
     def get_minibatch(self):
-        self.xs = np.random.choice(self.x_data, size=int(len(self.x_data)/40))
+        self.xs = np.random.choice(self.x_data, size=self.samples)
         #print(self.xs)
         
     def true_func(self, a, b, x):
@@ -153,7 +154,7 @@ def plot_paths(method = 'sgd', runs = 5, run_length = 50):
 
     plt.figure()
     plt.imshow(errors, cmap = 'Blues', interpolation='bilinear',
-               extent=[0.0,1.0,0.5,1.2])
+               extent=[0.0,1.0,0.5,1.2], vmin=0, vmax=40)
     for i in range(runs):
         plt.plot(a_s[i,:], b_s[i,:], color = 'green')
         plt.scatter(a_s[i,:], b_s[i,:], s= 30, alpha=0.3,
@@ -167,38 +168,44 @@ def plot_paths(method = 'sgd', runs = 5, run_length = 50):
     plt.ylim(0.5, 1.2)
     plt.xlim(0.0, 1.0)
     save_dir = 'images'
-    plt.savefig(os.path.join(save_dir, method + str(runs) +
-                             "runs" + str(run_length) + "length.png"))
+    plt.savefig(os.path.join(save_dir, method + "_" + str(runs) +
+                             "runs_" + str(run_length) + "length.png"))
+    plt.show()
+
+def plot_stochastic_surface(x_data, samples):
+    
+    a_guess = np.arange(0.0, 1.0, 0.01)
+    b_guess = np.arange(0.5, 1.5, 0.01)
+
+    errors = np.zeros([4, len(a_guess), len(b_guess)])
+    for i in range(4):
+        x = np.random.choice(x_data, size=samples)
+        errors[i, :, :] = err_surface(x, a_guess, b_guess)
+        
+    plt.figure()
+    f, axes = plt.subplots(2, 2, sharex='col', sharey='row')
+    for err, ax, i in zip(errors, axes.flat, np.arange(0, 4)):
+        im = ax.imshow(err, cmap = 'Blues', interpolation='bilinear',
+               extent=[0.0,1.0,0.5,1.2], vmin=0, vmax=40)
+        if i == 0 or i == 2:
+            ax.set_ylabel('$b$', fontsize = 20)
+        if i == 2 or i == 3:
+            ax.set_xlabel('$a$', fontsize = 20)
+        ax.plot((0.25, 0.25), (0.5, 1.2), 'k-')
+        ax.plot((0.0, 1.0), (0.75, 0.75), 'k-')
+        ax.set_ylim(0.5, 1.2)
+        ax.set_xlim(0.0, 1.0)
+    plt.tight_layout()
+    save_dir = 'images'
+    plt.savefig(os.path.join(save_dir, "err_surf_" + str(samples) +
+                             "samples.png"))
     plt.show()
 
 x_data = np.arange(0, 1, 0.01)
-y_data = true_func(x_data, 0.25, 0.75)
 
-a_guess = np.arange(0.0, 1.0, 0.01)
-b_guess = np.arange(0.5, 1.5, 0.01)
-l_a = len(a_guess)
-l_b = len(b_guess)
-
-#x_data_samp = np.random.choice(x_data, size=int(len(x_data)/2))
-x_data_samp = x_data
-y_data_samp = true_func(x_data_samp, 0.25, 0.75)
-
-plt.figure()
-plt.plot(x_data, y_data)
-plt.ylabel('$y$', fontsize = 20)
-plt.xlabel('$x$', fontsize = 20)
-plt.tight_layout()
-plt.savefig('images/func.png')
-
-#plt.scatter(x_data_samp, y_data_samp)
-#plt.show()
-
-errors = np.zeros([l_a, l_b])
-for i in range(l_a):
-    for j in range(l_b):
-        errors[l_a - i - 1, j] = err(x_data_samp, a_guess[i], b_guess[j])
-
+test2 = plot_stochastic_surface(x_data, 2)
 test = plot_paths()
+    
 #fig = plt.figure()
 #ax = fig.gca(projection='3d')
 #surf = ax.plot_surface(a_guess, b_guess, errors, cmap=cm.coolwarm,
