@@ -19,8 +19,8 @@ from scipy.stats import multivariate_normal
 from scipy.stats import bernoulli
 from scipy.stats import invgamma
 from scipy.stats import beta
-from datetime import datetime
-import os'''
+from datetime import datetime'''
+import os
 
 class Optimize(object):
     def __init__(self, a, b, init, x_data, stochastic = True):
@@ -111,13 +111,13 @@ class Optimize(object):
         self.a_rec = np.array([])
         self.b_rec = np.array([])
 
-    def generate_paths(self, k, n):
+    def generate_paths(self, k, n, method = 'sgd'):
         output_a = np.zeros([k, n])
         output_b = np.zeros([k, n])
         for i in range(k):
             print(i)
             self.input_params(0.8, 0.9)
-            self.opt(n, method = 'sgd')
+            self.opt(n, method)
             output_a[i, :] = self.a_rec
             output_b[i, :] = self.b_rec
             self.clear_rec()
@@ -128,38 +128,47 @@ def true_func(x, a, b):
             (1.0/0.01**0.5)*np.exp(-(x - b)**2/0.01))
  
 def err(xs, a_approx, b_approx):
+    
     tot = (true_func(xs, a_approx, b_approx) - true_func(xs, 0.25, 0.75))**2
     return np.mean(tot)
 
-def plot_paths():
+def err_surface(x_data, a_guess, b_guess):
 
-    x_data = np.arange(0, 1, 0.01)
-    a_guess = np.arange(0.0, 1.0, 0.01)
-    b_guess = np.arange(0.5, 1.5, 0.01)
     l_a = len(a_guess)
     l_b = len(b_guess)
-
     errors = np.zeros([l_a, l_b])
     for i in range(l_a):
         for j in range(l_b):
             errors[l_a - i - 1, j] = err(x_data, a_guess[i], b_guess[j])
+    return errors
+
+def plot_paths(method = 'sgd', runs = 5, run_length = 50):
+
     x_data = np.arange(0, 1, 0.01)
+    a_guess = np.arange(0.0, 1.0, 0.01)
+    b_guess = np.arange(0.5, 1.5, 0.01)
+    errors = err_surface(x_data, a_guess, b_guess)
     Example = Optimize(0.25, 0.75, [0.8, 0.9], x_data, stochastic = True)
-    a_s, b_s = Example .generate_paths(5, 70)
+    a_s, b_s = Example.generate_paths(runs, run_length, method)
 
     plt.figure()
-    plt.imshow(errors, cmap = 'Blues', interpolation='bilinear',  extent=[0.0,1.0,0.5,1.2])
-    for i in range(5):
+    plt.imshow(errors, cmap = 'Blues', interpolation='bilinear',
+               extent=[0.0,1.0,0.5,1.2])
+    for i in range(runs):
         plt.plot(a_s[i,:], b_s[i,:], color = 'green')
-        plt.scatter(a_s[i,:], b_s[i,:], s= 30, alpha=0.3, edgecolor='black', facecolor='g', linewidth=0.75)
-    plt.scatter(0.8, 0.9, s= 30, alpha=1.0, edgecolor='black', facecolor='r', linewidth=0.75)
+        plt.scatter(a_s[i,:], b_s[i,:], s= 30, alpha=0.3,
+                    edgecolor='black', facecolor='g', linewidth=0.75)
+    plt.scatter(0.8, 0.9, s= 30, alpha=1.0, edgecolor='black',
+                facecolor='r', linewidth=0.75)
     plt.plot((0.25, 0.25), (0.5, 1.2), 'k-')
     plt.plot((0.0, 1.0), (0.75, 0.75), 'k-')
     plt.ylabel('$b$', fontsize = 20)
     plt.xlabel('$a$', fontsize = 20)
     plt.ylim(0.5, 1.2)
     plt.xlim(0.0, 1.0)
-    plt.savefig('images/sgd_5.png')
+    save_dir = 'images'
+    plt.savefig(os.path.join(save_dir, method + str(runs) +
+                             "runs" + str(run_length) + "length.png"))
     plt.show()
 
 x_data = np.arange(0, 1, 0.01)
