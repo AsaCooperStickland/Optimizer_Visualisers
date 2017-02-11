@@ -176,6 +176,21 @@ def plot_stochastic_surface(x_data, samples):
     
     a_guess = np.arange(0.0, 1.0, 0.01)
     b_guess = np.arange(0.5, 1.5, 0.01)
+    true_err = err_surface(x_data, a_guess, b_guess)
+
+    plt.figure()
+    plt.imshow(true_err, cmap = 'Blues', interpolation='bilinear',
+               extent=[0.0,1.0,0.5,1.2], vmin=0, vmax=40)
+    plt.plot((0.25, 0.25), (0.5, 1.2), 'k-')
+    plt.plot((0.0, 1.0), (0.75, 0.75), 'k-')
+    plt.ylabel('$b$', fontsize = 20)
+    plt.xlabel('$a$', fontsize = 20)
+    plt.ylim(0.5, 1.2)
+    plt.xlim(0.0, 1.0)
+    plt.colorbar()
+    save_dir = 'images'
+    plt.savefig(os.path.join(save_dir, "true_error.png"))
+    plt.show()
 
     errors = np.zeros([4, len(a_guess), len(b_guess)])
     for i in range(4):

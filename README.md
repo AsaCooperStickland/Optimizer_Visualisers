@@ -5,13 +5,20 @@ Python code that shows the effects of using different techniques for stochastic 
 
 ## Setup
 
-We are going to use stochastic gradient descent to learn the values of a and b in this function:
+We are going to use stochastic gradient descent to learn the values of a (0.25) and b (0.75) in this function:
 
 ![Five Adam runs](https://github.com/AsaCooperStickland/Optimizer_Visualisers/blob/master/images/maineqn.gif)
 
 which looks like: 
 
 ![Five Adam runs](https://github.com/AsaCooperStickland/Optimizer_Visualisers/blob/master/images/func.png)
+
+If we choose 100 points between 0 and 1, and work out the error between the true function (with a = 0.25 and b = 0.75) and our guess for what a and b are.
+When we map out the errors it looks like this:
+
+![Five Adam runs](https://github.com/AsaCooperStickland/Optimizer_Visualisers/blob/master/images/true_error.png)
+
+There's obviously a minimum at a = 0.25, b = 0.75 where the error goes to zero, and it looks like a = 0.8, b = 1.0 is not a terrible fit. 
 
 ## Comparing Optimizers
 
