@@ -28,11 +28,15 @@ for examples of how to use this package to tune parameters of ML estimators
 using cross validation and bayesian optimization.
 
 
-## How does it work?
+## Comparing Optimizers
 
-Bayesian optimization works by constructing a posterior distribution of functions (gaussian process) that best describes the function you want to optimize. As the number of observations grows, the posterior distribution improves, and the algorithm becomes more certain of which regions in parameter space are worth exploring and which are not, as seen in the picture below.
+Vanilla SGD can't deal with how noisy the information it's getting is, and fails to find the global optimum completely! 
 
-![BayesianOptimization in action](https://github.com/AsaCooperStickland/Optimizer_Visualisers/images/adam_5.png)
+![Five Adam runs](https://github.com/AsaCooperStickland/Optimizer_Visualisers/blob/master/images/sgd_5.png)
+
+Since Adam uses momentum it can deal much better with the noisy information given by the sampled x values. 
+
+![Five Adam runs](https://github.com/AsaCooperStickland/Optimizer_Visualisers/blob/master/images/adam_5.png)
 
 As you iterate over and over, the algorithm balances its needs of exploration and exploitation taking into account what it knows about the target function. At each step a Gaussian Process is fitted to the known samples (points previously explored), and the posterior distribution, combined with a exploration strategy (such as UCB (Upper Confidence Bound), or EI (Expected Improvement)), are used to determine the next point that should be explored (see the gif below).
 
