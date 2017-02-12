@@ -13,12 +13,13 @@ which looks like:
 
 ![Five Adam runs](https://github.com/AsaCooperStickland/Optimizer_Visualisers/blob/master/images/func.png)
 
-If we choose 100 points between 0 and 1, and work out the error between the true function (with a = 0.25 and b = 0.75) and our guess for what a and b are.
+Say we have 100 points between 0 and 1, and work out the error between the true function (with a = 0.25 and b = 0.75) and our guess for what a and b are.
 When we map out the errors it looks like this:
 
 ![Five Adam runs](https://github.com/AsaCooperStickland/Optimizer_Visualisers/blob/master/images/true_error.png)
 
 There's obviously a minimum at a = 0.25, b = 0.75 where the error goes to zero, and it looks like a = 0.8, b = 1.0 is not a terrible fit. 
+
 
 ## Comparing Optimizers
 
@@ -34,13 +35,15 @@ This can be stopped by setting the learning rate to a lower value, which would o
 
 ![Five Adam runs](https://github.com/AsaCooperStickland/Optimizer_Visualisers/blob/master/images/adam_5.png)
 
-Adam also uses a moving average of the variance of the gradient, this is used to boost the learning rate of variables that are 'rarer'. But that 
-doesn't really apply here since we only have two variables for visualisation purposes. 
+Adam also uses a moving average of the variance of the gradient, this is used to boost the learning rate of variables that are 'rarer' by dividing the learning
+rate by the variance. But that doesn't really apply here since we only have two variables (for visualisation purposes). It is of course very useful in 
+deep learning tasks where we might have millions (or if we have access to fancy GPUs, billions!) of variables. 
 
 
 ### Dependencies
 * Numpy
 * Matplotlib
+
 ### References:
 * http://papers.nips.cc/paper/4522-practical-bayesian-optimization-of-machine-learning-algorithms.pdf
 * http://arxiv.org/pdf/1012.2599v1.pdf

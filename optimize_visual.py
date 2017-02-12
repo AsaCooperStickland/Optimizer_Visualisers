@@ -143,34 +143,34 @@ def err_surface(x_data, a_guess, b_guess):
             errors[l_a - i - 1, j] = err(x_data, a_guess[i], b_guess[j])
     return errors
 
-def plot_paths(method = 'sgd', runs = 5, run_length = 50):
+def plot_paths(methods = ['sgd', 'adam'], runs = 5, run_length = 50):
 
     x_data = np.arange(0, 1, 0.01)
     a_guess = np.arange(0.0, 1.0, 0.01)
     b_guess = np.arange(0.5, 1.5, 0.01)
     errors = err_surface(x_data, a_guess, b_guess)
     Example = Optimize(0.25, 0.75, [0.8, 0.9], x_data, stochastic = True)
-    a_s, b_s = Example.generate_paths(runs, run_length, method)
-
-    plt.figure()
-    plt.imshow(errors, cmap = 'Blues', interpolation='bilinear',
-               extent=[0.0,1.0,0.5,1.2], vmin=0, vmax=40)
-    for i in range(runs):
-        plt.plot(a_s[i,:], b_s[i,:], color = 'green')
-        plt.scatter(a_s[i,:], b_s[i,:], s= 30, alpha=0.3,
+    for method in methods:
+        a_s, b_s = Example.generate_paths(runs, run_length, method)
+        plt.figure()
+        plt.imshow(errors, cmap = 'Blues', interpolation='bilinear',
+               extent=[0.0,1.0,0.5,1.5], vmin=0, vmax=40)
+        for i in range(runs):
+            plt.plot(a_s[i,:], b_s[i,:], color = 'green')
+            plt.scatter(a_s[i,:], b_s[i,:], s= 30, alpha=0.3,
                     edgecolor='black', facecolor='g', linewidth=0.75)
-    plt.scatter(0.8, 0.9, s= 30, alpha=1.0, edgecolor='black',
+        plt.scatter(0.8, 0.9, s= 30, alpha=1.0, edgecolor='black',
                 facecolor='r', linewidth=0.75)
-    plt.plot((0.25, 0.25), (0.5, 1.2), 'k-')
-    plt.plot((0.0, 1.0), (0.75, 0.75), 'k-')
-    plt.ylabel('$b$', fontsize = 20)
-    plt.xlabel('$a$', fontsize = 20)
-    plt.ylim(0.5, 1.2)
-    plt.xlim(0.0, 1.0)
-    save_dir = 'images'
-    plt.savefig(os.path.join(save_dir, method + "_" + str(runs) +
+        plt.plot((0.25, 0.25), (0.5, 1.2), 'k-')
+        plt.plot((0.0, 1.0), (0.75, 0.75), 'k-')
+        plt.ylabel('$b$', fontsize = 20)
+        plt.xlabel('$a$', fontsize = 20)
+        plt.ylim(0.5, 1.2)
+        plt.xlim(0.0, 1.0)
+        save_dir = 'images'
+        plt.savefig(os.path.join(save_dir, method + "_" + str(runs) +
                              "runs_" + str(run_length) + "length.png"))
-    plt.show()
+        plt.show()
 
 def plot_stochastic_surface(x_data, samples):
     
@@ -180,8 +180,8 @@ def plot_stochastic_surface(x_data, samples):
 
     plt.figure()
     plt.imshow(true_err, cmap = 'Blues', interpolation='bilinear',
-               extent=[0.0,1.0,0.5,1.2], vmin=0, vmax=40)
-    plt.plot((0.25, 0.25), (0.5, 1.2), 'k-')
+               extent=[0.0,1.0,0.5,1.5], vmin=0, vmax=40)
+    plt.plot((0.25, 0.25), (0.5, 1.5), 'k-')
     plt.plot((0.0, 1.0), (0.75, 0.75), 'k-')
     plt.ylabel('$b$', fontsize = 20)
     plt.xlabel('$a$', fontsize = 20)
@@ -217,9 +217,8 @@ def plot_stochastic_surface(x_data, samples):
     plt.show()
 
 x_data = np.arange(0, 1, 0.01)
-
-test2 = plot_stochastic_surface(x_data, 2)
-test = plot_paths()
+figs = plot_stochastic_surface(x_data, 2)
+figs = plot_paths()
     
 #fig = plt.figure()
 #ax = fig.gca(projection='3d')
