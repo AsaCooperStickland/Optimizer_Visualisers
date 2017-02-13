@@ -76,23 +76,18 @@ class Optimize(object):
         self.grad = func_dash
 
     def stoch_grad_desc(self, eta):
-        #self.grad()
         self.a_approx = self.a_approx - eta*self.grad[0] 
         self.b_approx = self.b_approx - eta*self.grad[1]
-        #print(eta*self.grad)
 
     def adam(self, eta, beta_1, beta_2, epsilon, t):
         self.m = beta_1*self.m_old + (1 - beta_1)*self.grad
         self.v = beta_2*self.v_old + (1 - beta_2)*self.grad**2
         m_hat = self.m/(1.0 - beta_1**t)
         v_hat = self.v/(1.0 - beta_2**t)
-        #print(m_hat)
         self.a_approx = self.a_approx - eta*m_hat[0]/(v_hat[0]**0.5 + epsilon) 
         self.b_approx = self.b_approx - eta*m_hat[1]/(v_hat[1]**0.5 + epsilon)
-        #print((v_hat[1]**0.5 + epsilon))
         self.m_old = self.m
         self.v_old = self.v
-        #print('a', eta*m_hat[0]/(v_hat[0]**0.5 + epsilon))
 
     def opt(self, n, method = 'sgd'):
         for i in range(n):
