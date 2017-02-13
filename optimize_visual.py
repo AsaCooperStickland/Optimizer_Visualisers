@@ -98,17 +98,21 @@ class Optimize(object):
         m_hat = self.m/(1.0 - beta_1**t)
         v_hat = self.v/(1.0 - beta_2**t)
         f = self.err(x)
-        if t > 0:    
+        #print('rele change', (self.f_store[1] - self.f_store[0])/self.f_store[1])
+        if t > 1:    
             if f > self.f_store[0]:
                 delta_t = little_k + 1
                 tri_t = big_k + 1
             else:
-                delta_t = 1.0/little_k
-                tri_t = 1.0/big_k
+                delta_t = 1.0/big_k
+                tri_t = 1.0/little_k
             c_t = min(max(delta_t, f/self.f_store[0]) , tri_t)
             self.f_store[1] = c_t*self.f_store[0]
-            r_t = abs(self.f_store[1] - self.f_store[0])
-            self.d = beta_3*self.d_old + (1 - beta_3)*r_t
+            r_t = abs(self.f_store[1] - self.f_store[0])/min(self.f_store)
+            
+            if r_t < 1.0:
+                #print('r_t less than one {}'.format(r_t))
+                self.d = beta_3*self.d_old + (1 - beta_3)*r_t
         else:
             self.f_store[1] = f
             self.d = 1.0
@@ -117,7 +121,8 @@ class Optimize(object):
                                                       epsilon) 
         self.b_approx = self.b_approx - eta*m_hat[1]/(self.d*v_hat[1]**0.5 +
                                                       epsilon)
-        
+        if t > 9900:
+            print(self.d)
         self.m_old = self.m
         self.v_old = self.v
         self.d_old = self.d
@@ -133,9 +138,10 @@ class Optimize(object):
             if method == 'sgd':
                 self.stoch_grad_desc(0.00005)
             if method == 'adam':
-                self.adam(0.03, 0.9, 0.999, 10e-8, n)
+                self.adam(0.02, 0.9, 0.999, 10e-8, i+1)
             if method == 'eve':
-                self.eve(0.03, 0.9, 0.999, 0.999, 0.1, 10.0, 10e-8, n, self.xs)
+                self.eve(0.02, 0.9, 0.999, 0.999, 0.1, 10.0, 10e-8,
+                         i+1, self.xs)
 
     def input_params(self, a_new, b_new):
         self.a_approx = a_new
