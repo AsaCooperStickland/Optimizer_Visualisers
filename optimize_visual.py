@@ -41,6 +41,9 @@ class Optimize(object):
         self.m = np.zeros(2)
         self.v_old = np.zeros(2)
         self.v = np.zeros(2)
+        self.d = 1.0
+        self.d_old = 1.0
+        self.f_store = np.zeros(2) + self.err(self.xs)
         self.grad = self.calc_grad()
 
     def get_minibatch(self):
@@ -89,6 +92,39 @@ class Optimize(object):
         self.m_old = self.m
         self.v_old = self.v
 
+    def eve(self, eta, beta_1, beta_2, beta_3, little_k, big_k, epsilon, t, x):
+        self.m = beta_1*self.m_old + (1 - beta_1)*self.grad
+        self.v = beta_2*self.v_old + (1 - beta_2)*self.grad**2
+        m_hat = self.m/(1.0 - beta_1**t)
+        v_hat = self.v/(1.0 - beta_2**t)
+        f = self.err(x)
+        if t > 0:    
+            if f > self.f_store[0]:
+                delta_t = little_k + 1
+                tri_t = big_k + 1
+            else:
+                delta_t = 1.0/little_k
+                tri_t = 1.0/big_k
+            c_t = min(max(delta_t, f/self.f_store[0]) , tri_t)
+            self.f_store[1] = c_t*self.f_store[0]
+            r_t = abs(self.f_store[1] - self.f_store[0])
+            self.d = beta_3*self.d_old + (1 - beta_3)*r_t
+        else:
+            self.f_store[1] = f
+            self.d = 1.0
+            
+        self.a_approx = self.a_approx - eta*m_hat[0]/(self.d*v_hat[0]**0.5 +
+                                                      epsilon) 
+        self.b_approx = self.b_approx - eta*m_hat[1]/(self.d*v_hat[1]**0.5 +
+                                                      epsilon)
+        
+        self.m_old = self.m
+        self.v_old = self.v
+        self.d_old = self.d
+        self.f_store[0] = self.f_store[1]
+        self.f_store[1] = f
+        
+
     def opt(self, n, method = 'sgd'):
         for i in range(n):
             self.a_rec = np.append(self.a_rec, self.a_approx)
@@ -98,6 +134,8 @@ class Optimize(object):
                 self.stoch_grad_desc(0.00005)
             if method == 'adam':
                 self.adam(0.03, 0.9, 0.999, 10e-8, n)
+            if method == 'eve':
+                self.eve(0.03, 0.9, 0.999, 0.999, 0.1, 10.0, 10e-8, n, self.xs)
 
     def input_params(self, a_new, b_new):
         self.a_approx = a_new
@@ -106,6 +144,15 @@ class Optimize(object):
     def clear_rec(self):
         self.a_rec = np.array([])
         self.b_rec = np.array([])
+
+        self.m_old = np.zeros(2)
+        self.m = np.zeros(2)
+        self.v_old = np.zeros(2)
+        self.v = np.zeros(2)
+        self.d = 1.0
+        self.d_old = 1.0
+        self.f_store = np.zeros(2) + self.err(self.xs)
+        self.grad = self.calc_grad()
 
     def generate_paths(self, k, n, method = 'sgd'):
         output_a = np.zeros([k, n])
@@ -212,8 +259,8 @@ def plot_stochastic_surface(x_data, samples):
     plt.show()
 
 x_data = np.arange(0, 1, 0.01)
-figs = plot_stochastic_surface(x_data, 2)
-figs = plot_paths()
+#figs = plot_stochastic_surface(x_data, 2)
+figs = plot_paths(methods = ['adam', 'eve'])
     
 #fig = plt.figure()
 #ax = fig.gca(projection='3d')
