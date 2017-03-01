@@ -2,7 +2,6 @@
 
 Python code that shows the effects of using different techniques for stochastic gradient descent. 
 
-
 ## Setup
 
 We are going to use stochastic gradient descent to learn the values of a (0.25) and b (0.75) in this function:
@@ -18,14 +17,20 @@ When we map out the errors it looks like this:
 
 ![Five Adam runs](https://github.com/AsaCooperStickland/Optimizer_Visualisers/blob/master/images/true_error.png)
 
-There's obviously a minimum at a = 0.25, b = 0.75 where the error goes to zero, and it looks like a = 0.8, b = 1.0 is not a terrible fit. What if we don't 
-have 100 points, what if we just have 2? 
+There's obviously a minimum at a = 0.25, b = 0.75 where the error goes to zero, and it looks like a = 0.8, b = 1.0 is not a terrible fit. But what if we don't 
+have 100 points, what if we just have 2? This arises in deep learning because our training data is probably 10,000 examples on the very low end, and we don't 
+to compute millions of gradients to do one update step. So we use a 'minibatch' of training data, like the 2 samples I've used, although normally more like 100
+in proper deep learning. And in fact the stochasicity this introduces is helpful because it allows us to escape local minima where a 100% deterministic gradient
+descent might get stuck. And conversely ususally 1 or 2 examples introduces too much stochasticity, so about 100 is a nice compromise. 
 
 ![Five Adam runs](https://github.com/AsaCooperStickland/Optimizer_Visualisers/blob/master/images/err_surf_2samples.png)
 
 These are error surfaces with just two randomly sampled x values. They look similiar-ish, but some of them are missing maxima or minima. This is all our 
 optimzer has access to at each time step. If you sampled enough times and took an average it would look like the true error above- this is where 'momentum' 
 comes in. If we have some way of storing the average direction we're going in it's going to help us find the minima. 
+
+For a quick primer on stochastic gradient descent I highly reccomend this blog post: http://sebastianruder.com/optimizing-gradient-descent/
+Full of great details and tips on intuition. 
 
 
 ## Comparing Optimizers
@@ -51,7 +56,6 @@ term to the objective, and it's not clear that it's worth the extra hyperparamet
 from ICLR 2017 so...). So I won't go into it too much here but it's in the code if you want to play around with it!
 
 ### References:
-* http://papers.nips.cc/paper/4522-practical-bayesian-optimization-of-machine-learning-algorithms.pdf
-* http://arxiv.org/pdf/1012.2599v1.pdf
-* http://www.gaussianprocess.org/gpml/
-* https://www.youtube.com/watch?v=vz3D36VXefI&index=10&list=PLE6Wd9FR--EdyJ5lbFl8UuGjecvVw66F6
+* https://arxiv.org/abs/1412.6980
+* https://arxiv.org/pdf/1611.01505.pdf
+* http://sebastianruder.com/optimizing-gradient-descent/
